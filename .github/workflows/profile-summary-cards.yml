@@ -1,9 +1,9 @@
 name: GitHub-Profile-Summary-Cards
 
 on:
-  schedule: # roda todo dia à meia-noite
+  schedule:
     - cron: "0 0 * * *"
-  workflow_dispatch: # permite rodar manualmente
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,6 +11,15 @@ jobs:
     name: generate
     steps:
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: true  # importante para push funcionar
+          fetch-depth: 0
+
+      - name: Config Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - uses: vn7n24fzkq/github-profile-summary-cards@release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
