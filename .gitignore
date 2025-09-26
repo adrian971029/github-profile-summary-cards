@@ -111,9 +111,6 @@ out
 .yarn/install-state.gz
 .pnp.*
 
-# Ignore output
-profile-summary-card-output/
-
 # ctag
 tags
 tags.*
