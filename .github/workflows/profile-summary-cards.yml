@@ -2,45 +2,45 @@ name: GitHub-Profile-Summary-Cards
 
 on:
   schedule:
-    - cron: "0 0 * * *" # roda todo dia à meia-noite
-  workflow_dispatch:
+    - cron: "0 0 * * *" # roda todo dia à meia-noite UTC
+  workflow_dispatch: # permite rodar manualmente
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Generate Profile Cards
+    name: Generate and Commit Profile Cards
     steps:
-      # 1️⃣ Faz checkout do repositório com permissão de push
+      # 1️⃣ Checkout do repositório com permissão de push
       - uses: actions/checkout@v2
         with:
           persist-credentials: true
           fetch-depth: 0
 
-      # 2️⃣ Configura usuário do Git
+      # 2️⃣ Configura usuário do Git para commits
       - name: Config Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      # 3️⃣ Gera os cards
+      # 3️⃣ Gera os cards, mas não faz push automático
       - uses: vn7n24fzkq/github-profile-summary-cards@release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           USERNAME: adrian971029
-          AUTO_PUSH: false   # evita que a action tente fazer push sozinha
+          AUTO_PUSH: false
 
-      # 4️⃣ Lista arquivos gerados (debug)
+      # 4️⃣ Debug: listar arquivos gerados
       - name: List generated files
         run: ls -R ./profile-summary-card-output/
 
-      # 5️⃣ Commit e push apenas se houver alterações
-      - name: Commit and push cards
+      # 5️⃣ Commit e push: força o commit inicial e atualizações futuras
+      - name: Commit and push changes
         run: |
-          if [ -n "$(git status --porcelain ./profile-summary-card-output/)" ]; then
-            git add ./profile-summary-card-output/
+          git add ./profile-summary-card-output/
+          if git diff-index --quiet HEAD; then
+            echo "No changes to commit"
+          else
             git commit -m "Update GitHub profile cards"
             git push
-          else
-            echo "No changes to commit"
           fi
